@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+          	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+          	http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context-4.0.xsd
+			http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+	<!-- 1. 配置数据源 -->
+	<!-- org.springframework.jdbc.datasource.DriverManagerDataSource(spring)没有连接池的作用， 
+		com.mchange.v2.c3p0.ComboPooledDataSource(hibernate)和 org.apache.commons.dbcp.BasicDataSource有连接池的作用 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="jdbcUrl"
+			value="jdbc:mysql://localhost:3306/baiduwangpan?characterEncoding=UTF8"></property>
+		<property name="user" value="root"></property>
+		<property name="password" value="123456"></property>
+		<!-- 指定数据库连接池最大连接数 -->
+		<property name="maxPoolSize" value="20"></property>
+		<!-- 指定数据库连接池最小连接数 -->
+		<property name="minPoolSize" value="1"></property>
+		<!-- 指定数据库连接池缓存statement的数量 -->
+		<property name="maxStatements" value="50"></property>
+		<!-- 指定数据库连接池最大空闲时间 -->
+		<property name="maxIdleTime" value="20"></property>
+	</bean>
+	<!-- 2. 将数据源添加到sessionfactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="packagesToScan"><!-- 扫描指定包 -->
+			<list>
+				<value>com.wangpan.domain</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQLDialect<!-- 配置数据库语言 -->
+				hibernate.show_sql=true<!-- 配置显示hibernate使用的数据语言 -->
+				hibernate.format_sql=true
+				hibernate.hbm2ddl.auto=update
+				<!-- hibernate.current_session_context_class=thread -->
+			</value>
+		</property>
+	</bean>
+
+	<!-- 3. 将sessionfactory添加到hibernateTemplate -->
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- 4. 配置hibernate的局部事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+	<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- 4. 配置事务 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+	<tx:attributes>
+	<tx:method name="get*" read-only="true"/>
+	<tx:method name="add*" propagation="REQUIRED"/>
+	<tx:method name="*"/>		
+	</tx:attributes>
+	</tx:advice>
+	
+	<aop:config proxy-target-class="false">
+	<!-- 配置一个切入点 -->
+		<aop:pointcut id="wangpanService"
+			expression="execution(public * com.wangpan.service.*.*(..))" />
+		<aop:advisor pointcut-ref="wangpanService" advice-ref="txAdvice" />
+	</aop:config>
+
+</beans>
