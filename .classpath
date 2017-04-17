@@ -16,5 +16,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/hibernate"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/spring"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/struts2"/>
+	<classpathentry kind="lib" path="C:/Users/Administrator/Desktop/刘霞/Oauth接入sdk包/qqConnect_Server_SDK_java_v2.0/Sdk4J.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

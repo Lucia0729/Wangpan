@@ -28,7 +28,7 @@
 		<!-- 指定数据库连接池缓存statement的数量 -->
 		<property name="maxStatements" value="50"></property>
 		<!-- 指定数据库连接池最大空闲时间 -->
-		<property name="maxIdleTime" value="20"></property>
+		<property name="maxIdleTime" value="200"></property>
 	</bean>
 	<!-- 2. 将数据源添加到sessionfactory -->
 	<bean id="sessionFactory"
@@ -36,7 +36,7 @@
 		<property name="dataSource" ref="dataSource"></property>
 		<property name="packagesToScan"><!-- 扫描指定包 -->
 			<list>
-				<value>com.wangpan.domain</value>
+				<value>com.lxwp.domain</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -45,8 +45,7 @@
 				hibernate.show_sql=true<!-- 配置显示hibernate使用的数据语言 -->
 				hibernate.format_sql=true
 				hibernate.hbm2ddl.auto=update
-				<!-- hibernate.current_session_context_class=thread -->
-			</value>
+				</value>
 		</property>
 	</bean>
 
@@ -71,9 +70,21 @@
 	
 	<aop:config proxy-target-class="false">
 	<!-- 配置一个切入点 -->
-		<aop:pointcut id="wangpanService"
-			expression="execution(public * com.wangpan.service.*.*(..))" />
-		<aop:advisor pointcut-ref="wangpanService" advice-ref="txAdvice" />
+		<aop:pointcut id="lxwpService"
+			expression="execution(public * com.lxwp.service.*.*(..))" />
+		<aop:advisor pointcut-ref="lxwpService" advice-ref="txAdvice" />
 	</aop:config>
 
+
+<bean name="UserAction" class="com.lxwp.action.UserAction">
+	<property name="userService" ref="userService"></property>
+</bean>
+<bean name="userService" class="com.lxwp.service.impl.UserServiceImpl">
+	<property name="userDao" ref="userDao"></property>
+</bean>
+<bean name="userDao" class="com.lxwp.dao.impl.UserDaoImpl" parent="baseDao">
+</bean>
+<bean name="baseDao" class="com.lxwp.dao.impl.BaseDaoImpl">
+	<property name="hibernateTemplate" ref="hibernateTemplate"></property>
+</bean>
 </beans>

@@ -2,13 +2,25 @@
 <!DOCTYPE struts PUBLIC 
 "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
  "http://struts.apache.org/dtds/struts-2.0.dtd">
- <struts>
- <!-- 由spring管理struts的Action实例 -->
-	<constant name="struts.objectFactory" value="spring"></constant>
-<package name="baiduyunpan" namespace="" extends="json-default">
-	
+<struts>
+	<!-- 由spring管理struts的Action实例 -->
+	<!-- <constant name="struts.objectFactory" value="spring"></constant> -->
 
-	
+	<package name="WangPan" namespace="" extends="json-default">
 
+		<action name="login" class="UserAction" method="login">
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+			<!-- <interceptor-ref name="token"></interceptor-ref> -->
+			<interceptor-ref name="tokenSession"></interceptor-ref>
+			<result name="invalid.token">User/error.jsp</result>
+			<result name="success">User/content.jsp</result>
+			<result name="input">User/error.jsp</result>
+		</action>
+		
+		<action name="loginByqq" class="UserAction" method="qqlogin">
+		</action>
+
+		<action name="afterlogin" class="UserAction" method="afterlogin">
+		</action>
 	</package>
- </struts>
+</struts>
